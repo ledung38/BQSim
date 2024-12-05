@@ -1,0 +1,163 @@
+import math
+import datetime
+import os
+
+EPS = 1e-6
+
+def print_xml_node(node, n):
+    for i in range(n): print("\t", end="")
+    print(node.tag, node.attrib)
+    for child in node: print_xml_node(child, n+1)
+
+def print_xml_doc(root):
+    node = root.find("Processors")
+    print(node.tag)
+
+    if (node is None): return
+    for child in node: print_xml_node(child, 1)
+
+def get_compulsory_attr(xml_node, key, context):
+    value = xml_node.get(key, None)
+    if (value is None): raise Exception(context + ": Attribute " + key + " not found in XML!")
+    return value
+
+def format_path(path):
+    if (path.endswith("/")): path = path[:-1]
+    return path
+
+def get_basic_attrs(xml_node, global_data):
+    id = xml_node.get("id", None)
+    if (id is None): raise Exception("Module has no ID!" + xml_node.attrib)
+    id_set = global_data["id_set"]
+    if (id in id_set): raise Exception("Duplicate id" + id)
+    id_set.add(id)
+
+    data_dir = format_path(xml_node.get("data_dir", global_data["data_dir"]))
+    data_dir = data_dir + "/" + id
+    return id, data_dir
+
+
+def load_text_file(filename):
+    lines = []
+    try:
+        f = open(filename)
+        for line in f.readlines():
+            n = len(line)
+            if (n == 0): continue
+            if (line[n-1] == '\n'): line = line[0:n-1]
+            if (len(line) == 0): continue
+            lines.append(line)
+        f.close()
+    except:
+        pass
+    return lines
+
+def load_array_from_text_file(filename, type):
+    lines = load_text_file(filename)
+    a = []
+    for line in lines: a.append(type(line))
+    return a
+
+def save_text_file(filename, lines, fromLineIndex = 0):
+    try:
+        if (fromLineIndex == 0):
+            f = open(filename, "w")
+        else:
+            f = open(filename, "a")
+        cc = 0
+        for i in range(fromLineIndex, len(lines)):
+            f.write(str(lines[i]))
+            f.write("\n")
+            cc += 1
+        f.close()
+        if (fromLineIndex == 0):
+            print("Saved", filename, len(lines))
+        else:
+            print("Appended", filename, cc)
+    except:
+        print("ERROR saving to file", filename)
+    return lines
+
+def get_year_month_day(yyyymmdd):
+    yyyymm = yyyymmdd // 100
+    yyyy = yyyymm // 100
+    mm = yyyymm - yyyy * 100
+    dd = yyyymmdd - yyyymm * 100
+    return yyyy, mm, dd
+
+def get_date_timestamp(yyyymmdd):
+    y, m, d = get_year_month_day(yyyymmdd)
+    dt = datetime.datetime(y, m, d, tzinfo=datetime.timezone.utc)
+    return int(datetime.datetime.timestamp(dt))
+
+
+def time_to_seconds(hhmmss):
+    h, m, s = get_year_month_day(hhmmss)
+    return (h*60 + m) + s
+
+def int_to_str(n, digits):
+    s = str(n)
+    while len(s) < digits: s = "0" + s
+    return s
+
+def create_dir(dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+class BDict: 
+    def __init__(self):
+        self.__pairs = {}
+
+    def __getitem__(self, key):
+        return self.__pairs[key]
+    
+    def __setitem__(self, key, value): # once a key has been set, any later write on that key will be forbidden
+        if (key in self.__pairs):
+            print("Cannot set key", key, "when it has already been set!")
+            return
+        self.__pairs[key] = value
+    
+    def __iter__(self):
+        return iter(self.__pairs)
+    
+    def __str__(self):
+        return str(self.__pairs)
+
+def scale_to_booksize(alpha, booksize):
+    size = len(alpha)
+    for ii in range(size):
+        if (math.isnan(alpha[ii])): alpha[ii] = 0.0
+    if (booksize < EPS): return
+    total = 0
+    for ii in range(size): total += abs(alpha[ii])
+    if (total < EPS): return
+    scale = booksize / total
+    for ii in range(size): alpha[ii] *= scale
+    # print(alpha)
+
+
+def find_k_element(a, n, k):
+    if (k >= n): return -1e+12
+    l = 0
+    r = n-1
+    while (l < r):
+        key = a[(l + r) >> 1]
+        i = l
+        j = r
+        while (i <= j):
+            while ((i <= j) and (a[i] > key)): i += 1
+            while ((i <= j) and (a[j] < key)): j -= 1
+            if (i <= j):
+                temp = a[i]
+                a[i] = a[j]
+                a[j] = temp
+                i += 1
+                j -= 1
+        if (k <= j):
+            r = j
+        elif (k >= i):
+            l = i
+        else:
+            break
+    return a[k]
+
