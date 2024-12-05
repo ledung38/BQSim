@@ -1,16 +1,23 @@
 # BlueQuant-alpha-tools
+
 BlueQuant alpha tools
 
 # Requirements
-+ Python
-+ Matplotlib
+
+- Python
+- Matplotlib
 
 # PNL Summary
+
 Print summary of a pnl file, only one alpha at a time
-```
-python3 pnl_summary.py pnl/alpha1
-```
+from the BQSim root directory
+
+> `cd alphas`
+
+> `python ../alpha-tools/pnl_summary.py pnl/alpha1`
+
 The output will be like
+
 ```
    START-     END    LONG  SHORT      PNL    TVR   RET     IR
 20220101-20221231   500.0  500.0    513.2   36.6  50.1  0.084
@@ -21,9 +28,10 @@ The output will be like
 ```
 
 # Plot PNL
+
 Plot pnl chart of alphas, can plot multiple alphas in one graph
-```
-python3 pnl_plot.py pnl/alpha1 pnl/alpha2 pnl/alpha3
-```
+
+> `python ../alpha-tools/pnl_plot.py pnl/alpha1`
+
 The graph is like below
 ![Figure_1](https://github.com/user-attachments/assets/3450e777-a006-4dbb-a21c-ccd070049dad)

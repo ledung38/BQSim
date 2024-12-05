@@ -14,10 +14,10 @@
   
   <DataPool>
 	<Data id="BaseData" 
-		processor="../data_loader/binance_base_data_loader.py" 
+		processor="../data_loader/binance_base_data_loader_v2.py" 
 		field_map="open=2 high=3 low=4 close=5 volume=6"
 		data_period="1h"
-		data_path="PATH_DATA_SOURCE"
+		data_path="../bluequant_daily"
 	/>
 
 	<Data id="ALL" processor="../data_loader/top_liquid_univ.py" days="20" min_adv="1e6"/>
@@ -39,30 +39,13 @@
 
     <AlphaModules>
 	
-		<Alpha id="alpha1" processor="../alphas/alpha_ta1.py" universe="ALL" booksize="1e6"
+		<Alpha id="alpha1" processor="alpha1/alpha1.py" universe="ALL" booksize="1e6"
 				days="7" mode="1"
 				>
 			<Transforms>
 				<Transform processor="../transformers/alpha_neutralize.py"  mode="0"/>
 			</Transforms>
 		</Alpha>
-
-		<Alpha id="alpha2" processor="../alphas/alpha_ta1.py" universe="ALL" booksize="1e6"
-				days="7" mode="2"
-				>
-			<Transforms>
-				<Transform processor="../transformers/alpha_neutralize.py"  mode="0"/>
-			</Transforms>
-		</Alpha>
-
-		<Alpha id="alpha3" processor="../alphas/alpha_ta1.py" universe="ALL" booksize="1e6"
-				days="14" mode="0"
-				>
-			<Transforms>
-				<Transform processor="../transformers/alpha_neutralize.py"  mode="0"/>
-			</Transforms>
-		</Alpha>
-
 		
     </AlphaModules>
 
